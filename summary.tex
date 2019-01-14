@@ -343,26 +343,19 @@ Find solution $\min{\L(\*w)}$ s.t. $\*w \in \mathcal{C}$
 
 \section{Bias-Variance decomposition}
 \begin{itemize}
-	\item The expected test error can be expressed as the sum of two terms
-	\begin{itemize}
-	 	\item \textbf{Squared bias}: The average \textit{shift} of the predictions 
-	 	\item \textbf{Variance}: measure how data points vary around their average.
-	 \end{itemize} 
-% 	 \begin{center}
+	\item {\bf Simple} (e.g. large  $\lambda$) $\rightarrow$ large bias but low variance
+	\item {\bf Complex} (e.g. small  $\lambda$) $\rightarrow$ low bias but large variance
+	\item The expected squared loss between true model and learned model is a sum of three non-negative terms:
 
-	 	expected loss $= (\text{bias})^2$ + variance + noise
-	 	
-% 	 \end{center}
-	\item Model bias and estimation bias are important
-	\item RR increases estimation bias and reduces var
-	\item Model more complex increases test error
-	\item Small $\lambda \rightarrow$ low bias but large variance
-	\item Large $\lambda \rightarrow$ large bias but low variance
-	\item {\bf Simple} $\rightarrow$ large bias but low variance
-	\item {\bf Complex} $\rightarrow$ low bias but large variance
-	\begin{myalign*}
-	    \hspace{-.3cm} err = \sigma^2 + \E[f_{lse} - \E[f_{lse}]]^2 + [f_{true} - \E[f_{lse}]]^2
-	\end{myalign*}
+	 	$\mathbb{E}_S[(f(x) + \epsilon - f_{S}(x))^2] = Var[\epsilon]$ + bias + variance:
+	\begin{itemize}
+	 	\item \textbf{Bias} $= (f(x) - \mathbb{E}_{S'}[f_{S'}(x)])^2$: Difference between actual value and expected prediction.
+	 	\item \textbf{Variance} $= \mathbb{E}_S[(\mathbb{E}_{S'}[f_{S'}(x)] - f_S(x)])^2]$: variance of predictions between training sets.
+	\end{itemize}
+	
+	\item All terms are lower bounds for the error.
+	\item Cannot do better than $Var[\epsilon]$.
+	
 \end{itemize}
 % ========================================================
 
@@ -393,22 +386,22 @@ Find solution $\min{\L(\*w)}$ s.t. $\*w \in \mathcal{C}$
 	\begin{myalign*}
 	    p(\*y | \*X, \* w) = \prod_{n = 1}^N \sigma( \*x_n^T \* w)^{\*y_n}(1 - \sigma(\* x_n^T \* w))^{1 - \*y_n}
 	\end{myalign*}
-	\item The log-likelihood (w.r.t. MLE):
+	\item The negative log-likelihood (w.r.t. MLE):
 	\begin{myalign*}
 	    \hspace{-1.3cm} \L(\* w) &= - \sum_{n = 1}^N \*y_n \ln \sigma(\*x_n^T \*w)  + (1-\*y_n)\ln(1- \sigma(\*x_n^T \*w))\\
 	    &=  \sum_{n = 1}^N  \ln[1 + \exp(\*x_n^T \* w) ]-  \*y_n \*x_n^T\*w
 	\end{myalign*}
 	\item We can use the fact that
 	\begin{myalign*}
-	    \frac{d}{dx}\log(1 + \exp(x)) = \sigma(x)
+	    \frac{d}{dz}\ln(1 + \exp(z)) = \sigma(z)
 	\end{myalign*}
 	\item Gradient of the log-likelihood %LEARN
 	\begin{myalign*}
 	    \*g = \bm \nabla \L (\* w) &= \sum_{n = 1}^N  \*x_n( \sigma(\* x_n^T \* w) - \*y_n) \\
 	    &= \*X^T[\sigma(\*X \bm w) - \*y]
 	\end{myalign*}
-	\item The negative of the log-likelihood $- \L_{mle}(\bm w)$ is convex
-	\item \textbf{Hessian} of the log-likelihood
+	\item The neg. log-likelihood $- \L_{mle}(\bm w)$ is convex
+	\item \textbf{Hessian} of the neg. log-likelihood
 	\begin{itemize}
 		\item We know that
 		\begin{myalign*}
@@ -416,7 +409,7 @@ Find solution $\min{\L(\*w)}$ s.t. $\*w \in \mathcal{C}$
 		\end{myalign*}
 		\item Hessian is the derivative of the gradient
 		\begin{myalign*}
-		    \*H(\* w) &= - \frac{d \*g(\* w)}{d \* w^T}  = \sum_{n = 1}^N \frac{d}{d \* w^T} \* x_n \sigma(\* x_n^T \* w) \\
+		    \*H(\* w) &= \frac{d \*g(\* w)}{d \* w^T}  = \sum_{n = 1}^N \frac{d}{d \* w^T} \* x_n \sigma(\* x_n^T \* w) \\
 		    &= \sum_{n = 1}^N \* x_n \* x_n^T \sigma(\* x_n^T \* w)(1 - \sigma(\* x_n^T \* w)) \\
 		    &= \tilde{\*X}^T \*S \tilde{\*X}
 		\end{myalign*}
@@ -424,7 +417,7 @@ Find solution $\min{\L(\*w)}$ s.t. $\*w \in \mathcal{C}$
 		\begin{myalign*}
 		    S_{nn} = \sigma(\* x_n^T\* w)(1 - \sigma(\* x_n^T \* w))
 		\end{myalign*}
-		\item The negative of the log-likelihood is not strictly convex.
+		\item The neg. log-likelihood is not strictly convex. \textcolor{red}{????}
 	\end{itemize}
 	\item \textbf{Newton's Method} %LEARN
 	\begin{itemize}
@@ -439,6 +432,10 @@ Find solution $\min{\L(\*w)}$ s.t. $\*w \in \mathcal{C}$
 		\item Complexity: $O((ND^2 + D^3)I)$
 	\end{itemize}
 	\item \textbf{Regularized Logistic Regression}
+		\begin{itemize}
+	    	\item If data is linearly separable, there is no best weight vector $\Rightarrow$ optimisation does not stop.
+	    	\item $\rightarrow$ use penalty term.
+	    \end{itemize}
 	\begin{myalign*}
 	    \argmin_{\*w} 
 	    	- \sum_{n = 1}^N \ln p(\*y_n | \*x_n^T \* w) + \frac{\lambda}{2} \lVert \*w \lVert^2
