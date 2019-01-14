@@ -313,18 +313,20 @@ Find solution $\min{\L(\*w)}$ s.t. $\*w \in \mathcal{C}$
 
 % ========================================================
 
-\section{Ridge Regression (RR)}
+\section{Ridge Regression and LASSO}
 \begin{itemize}
-    \item Linear models usually overfit. We can penalize them with a \textbf{regularization term}
+    \item Add \textbf{regularization term}
     \begin{myalign*}
         \min_{\bm w} \L(\* w) + \Omega(\*w) 
     \end{myalign*}    
+    \item This corresponds to MAP estimate with prior on weights.
     \item $L_2$-Reg. (Ridge): $\Omega(\*w) = \lambda \lVert \*w \lVert_2^2$
     \item $\rightarrow$ small values of $\*w_i$, not sparse
     \item $\rightarrow$ $\*w^{\star} = (\*X^T\*X + \lambda ' \*I)^{-1}\*X^T\*y$ with $\lambda ' = 2N\lambda$
-    \item $\rightarrow$ No ill cond., $(\*X^T\*X + \lambda ' \*I)^{-1}$ exists
+    \item $\rightarrow$ $(\*X^T\*X + \lambda ' \*I)^{-1}$ exists (lifted eigenvalues)
     \item $L_1$-Reg. (Lasso): $\Omega(\*w) = \lambda \lVert \*w \lVert_1$
-    \item $\rightarrow$ large values of $\*w_i$, sparse
+    \item $\rightarrow$ sparsity of weight vector
+    \item $\rightarrow$ implicit model selection
     \item {\bf Maximum-a-posteriori (MAP)}
     \item (i) Posterior prob. $\propto$ Likelihood $\times$ Prior prob
     \begin{myalign*}
