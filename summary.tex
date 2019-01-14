@@ -612,13 +612,6 @@ Find solution $\min{\L(\*w)}$ s.t. $\*w \in \mathcal{C}$
 	    k(\*x, \*x') = \bm \phi(\*x)^T \bm \phi(\*x')
 	\end{myalign*}
 	\item \textbf{Kernel trick}: 
-%	\begin{itemize}
-%		\item We can work directly with $\*K$ and never have to worry about $\*X$
-%		\item Replace $\langle \*x, \*x' \rangle$ with $k(\*x, \*x')$.
-%		\item Kernel function can be interpreted as a measure of similarity
-%		\item The evaluation of a kernel is usually faster with $k$ than with $\bm \phi$
-%	\end{itemize}
-%	\item Kernelized rigde regression might be computationally more efficient in some cases.
 	\begin{itemize}
 		\item compute dot-product in $\mathbb{R}^m$ while remaining in $\mathbb{R}^n$
 		\item Replace $\langle \*x, \*x' \rangle$ with $k(\*x, \*x')$.
@@ -653,13 +646,11 @@ Find solution $\min{\L(\*w)}$ s.t. $\*w \in \mathcal{C}$
 \end{itemize}
 
 \section{K-means}
-\begin{itemize}
-	\item \textbf{Unsupervised learning}: Represent particular input patterns in a way that reflects the statistical structure of the overall collections of input partterns.
-	\item \textbf{Cluster} are groups of points whose inter-point distances are small compared to the distances outside the cluster.
-	\begin{myalign*}
+\begin{myalign*}
 	    \min_{\*z, \bm \mu} \L(\*z, \bm \mu) = \sum_{k = 1}^K \sum_{n = 1}^N z_{nk} ||\*x_n - \bm \mu_k||^2_2
 	\end{myalign*}
-	such that $z_{nk} \in \{0, 1\}$ and $\sum_{k = 1}^K z_{nk} = 1$
+	such that $z_{nk} \in \{0, 1\}$ and $\sum_{k = 1}^K z_{nk} = 1$ 
+\begin{itemize}
 	\item K-means algorithm (Coordinate Descent): \\
 	Initialize $\bm \mu_k$, then iterate
 	\begin{enumerate}
@@ -772,24 +763,18 @@ Find solution $\min{\L(\*w)}$ s.t. $\*w \in \mathcal{C}$
 		\end{myalign*}
 	\end{enumerate}
 	\item If covariance is diagonal $\rightarrow$ K-means.
+	\item $q_{nk}^{(t)} = p(z_n = k | x_n, \theta^{(t)})$ posterior of $z_n$
 \end{itemize}
 
 % ========================================================
 
 \section{Matrix factorization}
 \begin{itemize}
-	\item We have $D$ movies and $N$ users
-	\item $\*X$ is a matrix $D \times N$ with $x_{dn}$ the rating of n'th user for d'th movie.
-	\item We project data vectors $\*x_n$ to a smaller dimension $\*z_n \in \mathbb R^M$
-	\item We have now 2 latent variables:
-	\begin{itemize}
-		\item $\*Z$ a $N \times K$ matrix that gives features for the users
-	 	\item $\*W$ a $D \times K$ matrix that gives features for the movies
+	\item Find $\*X \approx \*W \*Z^\top$
+	 \begin{itemize}
+		\item $\*X$ is $D \times N$ (e.g movies $\times$ user)
+		\item $\*Z$ a $N \times K$, $\*W$ a $D \times K$ matrix
 	 \end{itemize} 
-	 \begin{myalign*}
-	     x_{dn} \approx \*w_d^T\*z_n
-	 \end{myalign*}
-	 \item We can add a regularizer and minimize the following cost:
 	 \begin{myalign*}
 	     \L(\*W, \*Z) = \frac{1}{2}\sum_{(d,n)\in\Omega} [x_{dn} - (\*W\*Z^T)_{dn}]^2 \\ + \frac{\lambda_w}{2} \lVert \*W \lVert_{\text{Frob}}^2 + \frac{\lambda_z}{2} \lVert \*Z \lVert_{\text{Frob}}^2 
 	 \end{myalign*}
@@ -801,6 +786,7 @@ Find solution $\min{\L(\*w)}$ s.t. $\*w \in \mathcal{C}$
 	 \begin{myalign*}
 	 	\frac{\partial}{\partial z_{n',k}} f_{d,n}(\*W, \*Z)  = -[x_{dn}-(\*W\*Z^T)_{dn}]w_{nk}
 	 \end{myalign*}
+	 updates:
 	 \begin{myalign*}
   		\*W^{t+1} &= \*W^t - \gamma \nabla_w f_{d,n}(\*W^t, \*Z^t) \\
  	 	\*Z^{t+1} &= \*W^t - \gamma \nabla_z f_{d,n}(\*W^t, \*Z^t)
@@ -810,7 +796,7 @@ Find solution $\min{\L(\*w)}$ s.t. $\*w \in \mathcal{C}$
 	     \*Z^T &\leftarrow (\*W^T \*W + \lambda_z \*I_K)^{-1} \*W^T \*X \\
 	     \*W^T &\leftarrow (\*Z^T \*Z + \lambda_w \*I_K)^{-1} \*Z^T\*X^T
 	 \end{myalign*}
-	 \item \textit{Complexity}: $O(D N K^2 + N K^3) \rightarrow O(D N K^2)$
+	 \item \textit{Complexity}: $O(D N K^2 + N K^3) \rightarrow O(D N K^2)$ \textcolor{red}{???}
 
 \end{itemize}
 % ========================================================
