@@ -76,10 +76,6 @@ A function $f(x)$ is convex if
 % ========================================================
 % ========================================================
 \section{Cost functions}
-\begin{itemize}
-    \item Cost functions are used to learn parameters that explain the data well.
-    \item It is essential to make sure that a global minimum exist $\rightarrow$ lower bounded
-\end{itemize}
 
 \textbf{Mean square error (MSE)}:
 \begin{myalign*}
@@ -87,14 +83,18 @@ A function $f(x)$ is convex if
 \end{myalign*}
 
 \begin{itemize}
-    \item MSE is \textbf{convex} thus it has only one global minumum value.
-    \item MSE is not good when outliers are present.
+    \item MSE is \textbf{strictly convex} thus it has only one global minumum value.
+    \item MSE is very prone to outliers.
 \end{itemize}
 
 \textbf{Mean Absolute Error (MAE)}:
 \begin{myalign*}
     MAE = \frac{1}{N} \sum^N_{n = 1} |y_n - f(\* x_n)|
 \end{myalign*}
+
+\begin{itemize}
+    \item MAE is more robust to outliers than MSE.
+\end{itemize}
 
 \textbf{Huber loss}
 \begin{myalign*}
@@ -128,7 +128,7 @@ Non-convex, non-diff., but robust to outliers.
 
 % ========================================================
 
-\section{Regression}
+\section{Linear Regression}
 \begin{itemize}
 	\item Model that assume linear relationship
 	\begin{myalign*}
@@ -136,17 +136,20 @@ Non-convex, non-diff., but robust to outliers.
 			&\approx \tilde{\* x}_n^T \*w \text{ ,where $\tilde{x}$ contains offset comp.}
 	\end{myalign*}
 	
-	
-    \item \textbf{Prediction}: predict the ouput for a new input vector.
-    \item \textbf{Interpretation}: understand the effect of inputs on output.
+    \item $D > N$ problem: task is underdetermined.
 
 \end{itemize}
 
 % ========================================================
 \section{Optimization}
+\begin{itemize}
+    \item Local minimum: $L(w^*) \leq L(w)~ \forall w: \Vert w-w^* \Vert < \epsilon$
+    \item Global minimum: $L(w^*) \leq L(w)~ \forall w$
+\end{itemize}
+
 \subsection{Grid search}
 \begin{itemize}
-    \item Compute the cost over a grid of $M$ points to find the minimum. Exponential Complexity. Hard to find a good range of values
+    \item Compute the cost over a grid of $V$ points. Exponential Complexity $\mathcal{O}(|V|^D), D$ is the dimension. Hard to find a good range of values. No guarantee to converge.
 \end{itemize}
 
 % ========================================================
@@ -164,18 +167,22 @@ Non-convex, non-diff., but robust to outliers.
    	\end{myalign*}
 
     \item With $\gamma$ too big, method might diverge. With $\gamma$ too small, convergence is slow.
+    \item Very sensitive to ill-conditioning $\Rightarrow$ always normalize features $\Rightarrow$ allow different directions to converge at same speed.
 \end{itemize}
 
 
 % ========================================================
 
 \subsection{SGD - Stochastic Gradient Descent}
-
-In ML, most cost functions are formulated as a sum over the training examples:
-$$ \L(\*w) = \frac{1}{N}\sum_{n=1}^N\L_n(\*w)$$
-$\Rightarrow$ SGD update rule (only n-th training exam.):
+SGD update rule (only n-th training example):
 $$ \*w^{(t + 1)} \leftarrow \*w^{(t)} - \gamma \bm \nabla \L_n(\*w^{(t)})$$
 \emph{Idea}: Cheap but unbiased estimate of grad. $$\E[\bm\nabla\L_n(\*w)] = \bm \nabla(\*w)$$
+\\
+Robbins-Monroe condition:
+\begin{itemize}
+	\item $\gamma^{(t)}: \sum^{\infty}_{t=1} \gamma^{(t)} = \infty; \sum^{\infty}_{t=1} (\gamma^{(t)})^2 < \infty$
+	\item e.g. $\gamma^{(t)} = 1 / (t+1)^r, r \in (0.5, 1)$
+\end{itemize}
 
 % ========================================================
 
@@ -205,11 +212,8 @@ Update rule : $ \* w^{(t + 1)} \leftarrow \* w^{(t)} - \gamma \* g^{(t)}$
     \item Optimality conditions:
     \begin{enumerate}
         \item \textit{necessary}: gradient equal zero: $\frac{d \L(\*w^*)}{d \*w} = 0$
-        \item \textit{sufficient}: Hessian matrix is positive definite: $\* H(\*w^*) = \frac{d^2 \L(\*w^*)}{d \*w d \*w^T}$
+        \item \textit{sufficient}: Hessian matrix is positive definite: $\* H(\*w^*) = \frac{d^2 \L(\*w^*)}{d \*w d \*w^T} = \frac{1}{N} X^TX$
     \end{enumerate}
-
-    \item Very sensitive to illconditioning $\Rightarrow$ always normalize features.
-    \item \textit{Complexity}: $O(NDI)$ with $I$ the number of iterations
 \end{itemize}
 
 
@@ -242,6 +246,13 @@ Find solution $\min{\L(\*w)}$ s.t. $\*w \in \mathcal{C}$
     
 \end{itemize}
 
+\subsection{Complexities for MSE/MAE per iteration}
+\begin{itemize}
+    \item GD=$\mathcal{O}(ND)$
+    \item MB-GD=$\mathcal{O}(BD)$
+    \item SGD=$\mathcal{O}(D)$
+\end{itemize}
+
 % ========================================================
 
 \section{Least Squares}
@@ -265,13 +276,17 @@ Find solution $\min{\L(\*w)}$ s.t. $\*w \in \mathcal{C}$
     \item \textit{Complexity}: $O(ND^2 + D^3) \equiv O(ND^2)$
 
     \item $\*X$ can be rank deficient when $D > N$ or when the comlumns $\*{\bar{x}}_d$ are nearly collinear. $\Rightarrow$  matrix is ill-conditioned.
+    \item Can still solve using a linear system solver using normal equations:
+    \begin{myalign*}
+    	\*X^\top \*X\*w = \*X^\top \*y
+    \end{myalign*}
 \end{itemize}
 
 % ========================================================
 
 \section{Maximum Likelihood (MLE)} 
 \begin{itemize}
-    \item Let define our mistakes $\epsilon_n \sim \N(0, \sigma^2)$.
+    \item Let define the noise $\epsilon_n \sim \N(0, \sigma^2)$.
     \begin{myalign*}
         \rightarrow \*y_n = \*{x}_n^T \* w + \epsilon_n
     \end{myalign*}    
