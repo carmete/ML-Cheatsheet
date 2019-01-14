@@ -343,8 +343,14 @@ Find solution $\min{\L(\*w)}$ s.t. $\*w \in \mathcal{C}$
 
 \section{Model Selection}
 \begin{itemize}
-    \item Generalisation error: $L_D(f)=\mathbb{E}[l(y,f(x))]$
-    
+    \item Generalisation error: $L_D(f)=\mathbb{E}[l(y,f(x))]$ cannot be computed because D generally unknown.
+    \item Instead approximate by  $L_{S_{test}}(f_{train}) = \frac{1}{\vert S_{test} \vert} \sum_{S_test} l(y_n, f_{S_{train}}(x_n))$
+    \item In expectation this corresponds to the true error.
+    \item But what about the variance? If comparing K models:
+    \item $\mathbb{P}[\max_k\vert L_D(f_k) - L_{test}(f_k) \vert \geq \sqrt{\frac{(bia)^2\ln(2K/\delta)}{2\vert S_{test} \vert}}] \leq \delta$
+    \item Error decreases with as $\mathbb{O}(1/\sqrt{\vert S_{test} \vert})$
+    \item Error only goes up by $\sqrt{\ln(K)}$ for testing several models.
+    \item use cross-validation for an efficient, unbiased estimate of generalisation error and variance.
 \end{itemize}
 
 \section{Bias-Variance decomposition}
