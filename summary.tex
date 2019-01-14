@@ -125,21 +125,6 @@ Non-convex, non-diff., but robust to outliers.
 \textbf{Hinge loss}: $[1 - y_n f(\* x_n)]_+ = \max(0, 1 - y_n f(\* x_n))$ \\
 \textbf{Logistic loss}: $ \log(1 - \exp(y_n f(\* x_n)))$
 
-
-% ========================================================
-
-\section{Linear Regression}
-\begin{itemize}
-	\item Model that assume linear relationship
-	\begin{myalign*}
-	  \*y_n & \approx f(\* x_n) := \*w_0 + \*w_1 \*x_{n1} + ... = \*w_0 + \*x^T_n \*w \\
-			&\approx \tilde{\* x}_n^T \*w \text{ ,where $\tilde{x}$ contains offset comp.}
-	\end{myalign*}
-	
-    \item $D > N$ problem: task is underdetermined.
-
-\end{itemize}
-
 % ========================================================
 \section{Optimization}
 \begin{itemize}
@@ -149,19 +134,19 @@ Non-convex, non-diff., but robust to outliers.
 
 \subsection{Grid search}
 \begin{itemize}
-    \item Compute the cost over a grid of $V$ points. Exponential Complexity $\mathcal{O}(|V|^D), D$ is the dimension. Hard to find a good range of values. No guarantee to converge.
+    \item Compute the cost over a grid of $V$ points. Exponential complexity $\mathcal{O}(|V|^D)$. Hard to find a good value range. No guarantee to converge.
 \end{itemize}
 
 % ========================================================
 
 \subsection{GD - Gradient Descent (Batch)}
 \begin{itemize}
-	\item GD uses only first-order information and takes steps in the opposite direction of the gradient
+	\item GD uses only first-order information
 	\item Given cost function $\L(\*w)$ we want to find $\* w$
 	\begin{myalign*}
 	    \*w = \arg\min_{\*w} \L(\*w)
 	\end{myalign*}
-    \item Take steps in the opposite direction of the gradient
+    \item Take steps in the opposite direction of gradient
    	\begin{myalign*}
 	    \*w^{(t + 1)} \leftarrow \*w^{(t)} - \gamma \bm \nabla \L(\*w^{(t)})
    	\end{myalign*}
@@ -196,22 +181,15 @@ Update rule : $ \* w^{(t + 1)} \leftarrow \* w^{(t)} - \gamma \* g^{(t)}$
 
 \subsection{Gradients for MSE}
 \begin{itemize}
-    \item We define the error vector $\* e$:
-    \begin{myalign*}
-        \*e := \* y - \*{X} \*w
-    \end{myalign*}
+    \item Define error $\*e := \* y - \*{X} \*w$
     \item and MSE as follows:
     \begin{myalign*}
         \L(\* w) = \frac{1}{2N} \sum^N_{n = 1} (\*y_n - \*{\tilde{x}}_n^T \* w)^2 = \frac{1}{2N} \*e^T \*e
     \end{myalign*}
-    \item then the gradient is given by
-    \begin{myalign*}
-        \bm \nabla \L(\* w) = - \frac{1}{N} \*{X}^T \*e
-    \end{myalign*}
 
     \item Optimality conditions:
     \begin{enumerate}
-        \item \textit{necessary}: gradient equal zero: $\frac{d \L(\*w^*)}{d \*w} = 0$
+        \item \textit{necessary}: $\frac{d \L(\*w^*)}{d \*w} = - \frac{1}{N} \*{X}^T \*e = 0$
         \item \textit{sufficient}: Hessian matrix is positive definite: $\* H(\*w^*) = \frac{d^2 \L(\*w^*)}{d \*w d \*w^T} = \frac{1}{N} X^TX$
     \end{enumerate}
 \end{itemize}
@@ -246,7 +224,7 @@ Find solution $\min{\L(\*w)}$ s.t. $\*w \in \mathcal{C}$
     
 \end{itemize}
 
-\subsection{Complexities for MSE/MAE per iteration}
+\subsection{Iteration complexities for MSE/MAE}
 \begin{itemize}
     \item GD=$\mathcal{O}(ND)$
     \item MB-GD=$\mathcal{O}(BD)$
@@ -275,7 +253,7 @@ Find solution $\min{\L(\*w)}$ s.t. $\*w \in \mathcal{C}$
     
     \item \textit{Complexity}: $O(ND^2 + D^3) \equiv O(ND^2)$
 
-    \item $\*X$ can be rank deficient when $D > N$ or when the comlumns $\*{\bar{x}}_d$ are nearly collinear. $\Rightarrow$  matrix is ill-conditioned.
+    \item $\*X$ can be rank deficient when $D > N$ or when the columns $\*{\bar{x}}_d$ are nearly collinear. $\Rightarrow$  matrix is ill-conditioned.
     \item Can still solve using a linear system solver using normal equations:
     \begin{myalign*}
     	\*X^\top \*X\*w = \*X^\top \*y
@@ -319,7 +297,6 @@ Find solution $\min{\L(\*w)}$ s.t. $\*w \in \mathcal{C}$
     \begin{myalign*}
         \min_{\bm w} \L(\* w) + \Omega(\*w) 
     \end{myalign*}    
-    \item This corresponds to MAP estimate with prior on weights.
     \item $L_2$-Reg. (Ridge): $\Omega(\*w) = \lambda \lVert \*w \lVert_2^2$
     \item $\rightarrow$ small values of $\*w_i$, not sparse
     \item $\rightarrow$ $\*w^{\star} = (\*X^T\*X + \lambda ' \*I)^{-1}\*X^T\*y$ with $\lambda ' = 2N\lambda$
@@ -343,20 +320,20 @@ Find solution $\min{\L(\*w)}$ s.t. $\*w \in \mathcal{C}$
 
 \section{Model Selection}
 \begin{itemize}
-    \item Generalisation error: $L_D(f)=\mathbb{E}[l(y,f(x))]$ cannot be computed because D generally unknown.
-    \item Instead approximate by  $L_{S_{test}}(f_{train}) = \frac{1}{\vert S_{test} \vert} \sum_{S_test} l(y_n, f_{S_{train}}(x_n))$
-    \item In expectation this corresponds to the true error.
-    \item But what about the variance? If comparing K models:
+    \item Generalisation error: $L_D(f)=\mathbb{E}[l(y,f(x))]$, but D normally unknown.
+    \item Instead approximate by  $L_{S_{test}}(f_{train}) = \frac{1}{\vert S_{test} \vert} \sum_{S_{test}} l(y_n, f_{S_{train}}(x_n))$
+    \item In expectation this equates the true error.
+    \item Worst case, if comparing K models:
     \item $\mathbb{P}[\max_k\vert L_D(f_k) - L_{test}(f_k) \vert \geq \sqrt{\frac{(bia)^2\ln(2K/\delta)}{2\vert S_{test} \vert}}] \leq \delta$
-    \item Error decreases with as $\mathbb{O}(1/\sqrt{\vert S_{test} \vert})$
-    \item Error only goes up by $\sqrt{\ln(K)}$ for testing several models.
+    \item Error decreases as $\mathbb{O}(1/\sqrt{\vert S_{test} \vert})$
+    \item Error only goes up by $\sqrt{\ln(K)}$ for testing K models.
     \item use cross-validation for an efficient, unbiased estimate of generalisation error and variance.
 \end{itemize}
 
 \section{Bias-Variance decomposition}
 \begin{itemize}
-	\item {\bf Simple} (e.g. large  $\lambda$) $\rightarrow$ large bias but low variance
-	\item {\bf Complex} (e.g. small  $\lambda$) $\rightarrow$ low bias but large variance
+	\item {\bf Simple} (e.g. large  $\lambda$) $\rightarrow$ large bias, but low variance
+	\item {\bf Complex} (e.g. small  $\lambda$) $\rightarrow$ low bias, but large variance
 	\item The expected squared loss between true model and learned model is a sum of three non-negative terms:
 
 	 	$\mathbb{E}_S[(f(x) + \epsilon - f_{S}(x))^2] = Var[\epsilon]$ + bias + variance:
@@ -374,8 +351,7 @@ Find solution $\min{\L(\*w)}$ s.t. $\*w \in \mathcal{C}$
 \section{Logistic Regression}
 
 \begin{itemize}
-	\item \textbf{Classification} relates input variables $\*x$ to discrete output variable $\*y$
-	\item \textbf{Binary classifier}: we use $y = 0$ for $\*C_1$ and $\*y = 1$ for $\*C_2$.
+	\item \textbf{Binary classifier}: use $y \in \{0, 1\}$.
 	\item Can use least-squares to predict $\hat{y}_*$
 	\begin{myalign*}
 	    \hat{y} = 
@@ -391,8 +367,8 @@ Find solution $\min{\L(\*w)}$ s.t. $\*w \in \mathcal{C}$
 	    \sigma(x) = \frac{\exp(x)}{1 + \exp(x)}
 	\end{myalign*}
 	\begin{myalign*}
-	    p(\*y_n = \*C_1| \*x_n) = \sigma( \*x^T \*w)\\
-	    p(\*y_n = \*C_2 | \*x_n) = 1 - \sigma( \*x^T \*w)
+	    p(\*y_n = 1| \*x_n) = \sigma( \*x^T \*w)\\
+	    p(\*y_n = 0 | \*x_n) = 1 - \sigma( \*x^T \*w)
 	\end{myalign*}
 	\item The probabilistic model:
 	\begin{myalign*}
@@ -425,7 +401,7 @@ Find solution $\min{\L(\*w)}$ s.t. $\*w \in \mathcal{C}$
 		    &= \sum_{n = 1}^N \* x_n \* x_n^T \sigma(\* x_n^T \* w)(1 - \sigma(\* x_n^T \* w)) \\
 		    &= \tilde{\*X}^T \*S \tilde{\*X}
 		\end{myalign*}
-		where $\*S$ is a $N \times N$ diagonal matrix with diagonals
+		where $\*S$ is a $N \times N$ diagonal with
 		\begin{myalign*}
 		    S_{nn} = \sigma(\* x_n^T\* w)(1 - \sigma(\* x_n^T \* w))
 		\end{myalign*}
@@ -471,15 +447,12 @@ Find solution $\min{\L(\*w)}$ s.t. $\*w \in \mathcal{C}$
       \begin{myalign*}
 	  \rightarrow \exp( \log(\frac{\mu}{1 - \mu})y + \log(1 - \mu)))
       \end{myalign*}
-      (i) there is a relationship between $\eta$ and $\mu$ through the \textbf{link function}
+      (i) \textbf{link function g} relates $\eta$ and $\mu$
       \begin{myalign*}
+      \bm \eta = \*g(\bm \mu) \Leftrightarrow \bm \mu = \*g^{-1}(\bm \eta) \\
 	  \eta = \log(\frac{\mu}{1 - \mu}) \leftrightarrow \mu = \frac{e^{\eta}}{1 + e^{\eta}}
       \end{myalign*}
       (ii) Note that $\mu$ is the mean parameter of $y$
-      (iii) Relationship between the mean $\bm \mu$ and $\bm \eta$ is defined using a link function $g$
-        \begin{myalign*}
-            \bm \eta = \*g(\bm \mu) \Leftrightarrow \bm \mu = \*g^{-1}(\bm \eta)
-        \end{myalign*}
       \item {\bf Gaussian} distribution example
       \begin{myalign*}
 	  \exp( (\frac{\mu}{\sigma^2}, \frac{-1}{2\sigma^2})(y, y^2)^T - \frac{\mu^2}{2\sigma^2}-\frac{1}{2}\ln(2\pi \sigma^2))
@@ -520,13 +493,13 @@ Find solution $\min{\L(\*w)}$ s.t. $\*w \in \mathcal{C}$
 	\end{myalign*}
 	\item The k-NN classifier:
 	\begin{myalign*}
-	    f(\*x) = modus{x_n| \*x_n \in nbh_k(\*x)}
+	    f(\*x) = modus\{x_n| \*x_n \in nbh_k(\*x)\}
 	\end{myalign*}
 	\item Large k $\rightarrow$ smoothing over large area
 	\item Small k $\rightarrow$ averaging over small area
 	\item \textbf{Curse of dimensionality}:
 	\begin{itemize}
-		\item[a)] As dimensionality grows fixed-size training set covers dwindling fraction of input space $\Rightarrow$ If we want to consider fixed fraction $\alpha$ of points and increase dimension, we need to explore almost whole range in each dimension.
+		\item[a)] If we want to consider fixed fraction $\alpha$ of points and increase dimension, we need to explore almost whole range in each dimension.
 		\item[b)] In high dimensions, points are far from each other $\Rightarrow$ choice of NN becomes essentially random. \\
 		          Need radius \\
 		          $r = \sqrt[\leftroot{-2}\uproot{2}d]{(1-\frac{1}{\sqrt[\leftroot{-2}\uproot{2}N]{2}})}$ \\
@@ -534,7 +507,7 @@ Find solution $\min{\L(\*w)}$ s.t. $\*w \in \mathcal{C}$
 	\end{itemize}
 	\item \textbf{NN performance}:
 	\begin{itemize}
-		\item Optimal classifier:$ f_*(x) = \mathbb{1}{\mathbbm{P}[y=1|x] > \frac{1}{2}}$
+		\item Optimal classifier:$ f_*(x) = \mathbbm{1}\{\mathbbm{P}[y=1|x] > \frac{1}{2}\}$
 		\item $\mathbb{E}_S[L(f_S)] \leq 2 L(f_*) + 4c\sqrt{d}N^{\frac{-1}{1+d}}$
 	\end{itemize}
 \end{itemize}
@@ -543,8 +516,7 @@ Find solution $\min{\L(\*w)}$ s.t. $\*w \in \mathcal{C}$
 
 \section{Support Vector Machine} 
 \begin{itemize}
-	\item Assume $y_n \in \{-1, 1\}$
-	\item SVM optimizes the following cost
+	\item Assume $y_n \in \{-1, 1\}$ and optimise
 	\begin{myalign*}
 	    \L(\* w) = \min_{\* w} \sum_{n = 1}^N [1 - \*y_n x_n^T \* w]_+ + \frac{\lambda}{2} \lVert \*w \lVert^2
 	\end{myalign*}
@@ -592,7 +564,7 @@ Find solution $\min{\L(\*w)}$ s.t. $\*w \in \mathcal{C}$
 	\item {\bf Non support vector}: Example that lies on the correct side, outside margin $\bm \alpha_n = 0$
 	\item {\bf Essen. support vector}: Example that lies on the margin $\bm \alpha_n \in (0,1)$
 	\item {\bf Bound support vector}: Example that lies strictly inside the margin or wrong side $\bm \alpha_n = 1$
-	\item Use Coordinates Descent to find $\bm \alpha$. Update one coordinate ($\argmin$) at the time and others constant.
+	\item Use Coordinates ascent to find $\bm \alpha$. Update one coordinate ($\argmin$) at the time and others constant.
 \end{itemize}
 
 % ========================================================
@@ -609,7 +581,7 @@ Find solution $\min{\L(\*w)}$ s.t. $\*w \in \mathcal{C}$
 	\begin{myalign*}
 	     \*w^* = \*X^T\bm \alpha^*, \quad \text{with } \* w^* \in \R^D \text{ and } \bm \alpha^* \in \R^N
 	\end{myalign*}
-	\item The representer theorem allows us to write an equivalent optimization problem in terms of $\bm \alpha$.
+	\item Following representer theorem write:
 	\begin{myalign*}
 	    \bm \alpha = \argmax_{\bm \alpha} 
 	    \left(
@@ -642,19 +614,6 @@ Find solution $\min{\L(\*w)}$ s.t. $\*w \in \mathcal{C}$
 	\begin{myalign*}
 	    \*y = \*w^T \*x = \sum_{i = 1}^K \alpha_i \*x_i^T \*x = \sum_{i = 1}^K \alpha_i k(\*x, \*x_i) 
 	\end{myalign*}
-\end{itemize}
-
-% ========================================================
-
-\section{Unsupervised}
- Learn pattern without labels.
-\begin{itemize}
-	\item \textbf{word2vec}: map every word to a vector $w_i \in \mathbb{R}^K$, K large, that captures its semantics.
-	\item \textbf{Topic model}: Documents consist of collections of topics
-		\begin{itemize}
-			\item topic = probability distribution over words
-			\item use clustering to pick out respresentative topics
-		\end{itemize}
 \end{itemize}
 
 \section{K-means}
@@ -723,7 +682,7 @@ Find solution $\min{\L(\*w)}$ s.t. $\*w \in \mathcal{C}$
 	    = \prod_{n=1}^N \prod_{k = 1}^K [(\N(\*x_n |\bm \mu_k, \bm \Sigma_k))^{z_{nk}}] \prod_{k = 1}^K [\pi_k]^{z_{nk}}
 	\end{myalign*}
 	\item $z_n$ are called \textit{latent} unobserved variables
-	\item Unknown parameters are given by $ \bm \theta = \{\bm \mu, \bm \Sigma, \bm \pi\}$
+	\item Unknown parameters are $\bm \theta = \{\bm \mu, \bm \Sigma, \bm \pi\}$
 	\item We get the \textbf{marginal likelihood} by marginalizing $z_n$ out from the likelihood
 	\begin{myalign*}
 	    p(\*x_n | \bm \theta) &= \sum_{k = 1}^K p(\*x_n, z_{n} = k | \bm \theta)\\
@@ -785,7 +744,7 @@ Find solution $\min{\L(\*w)}$ s.t. $\*w \in \mathcal{C}$
 	\item Find $\*X \approx \*W \*Z^\top$
 	 \begin{itemize}
 		\item $\*X$ is $D \times N$ (e.g movies $\times$ user)
-		\item $\*Z$ a $N \times K$, $\*W$ a $D \times K$ matrix
+		\item $\*Z$ is $N \times K$, $\*W$ is $D \times K$ matrix
 	 \end{itemize} 
 	 \begin{myalign*}
 	     \L(\*W, \*Z) = \frac{1}{2}\sum_{(d,n)\in\Omega} [x_{dn} - (\*W\*Z^T)_{dn}]^2 \\ + \frac{\lambda_w}{2} \lVert \*W \lVert_{\text{Frob}}^2 + \frac{\lambda_z}{2} \lVert \*Z \lVert_{\text{Frob}}^2 
@@ -815,13 +774,20 @@ Find solution $\min{\L(\*w)}$ s.t. $\*w \in \mathcal{C}$
 
 \section{Text Representation}
 \begin{itemize}
+	\item \textbf{word2vec}: map every word to a vector $w_i \in \mathbb{R}^K$, K large, that captures its semantics.
+	\item \textbf{Topic model}: Documents consist of collections of topics
+		\begin{itemize}
+			\item topic = probability distribution over words
+			\item use clustering to pick out respresentative topics
+		\end{itemize}
 	\item \textbf{Word representations by matrix factorisation}
 	\item typically use log counts from co-occurance matrix
-	\item $\min_{w,z} L(w,z) = \frac{1}{2} \sum_{(d,n)\in\Omega} f_{dn} [x_{dn} - (WZ^\top)_{dn}]^2$, $f_{dn}$: importance of entry
+	\item $\min_{w,z} L(w,z) = \frac{1}{2} \sum_{(d,n)\in\Omega} f_{dn} [x_{dn} - (WZ^\top)_{dn}]^2$
+	\item $f_{dn}$: importance of entry
 	\item $f_{dn} = 1$ is okay, but better $f_{dn} = \min[1, (n_{dn}/N_{max}^\alpha], \alpha \in [0,1], n_{dn}$ are counts.
-	\item weighting is called GloVe (word2vec variant) and creates spacial analogies (man - king; woman - queen)
+	\item this weighting is called GloVe (word2vec variant) and creates spatial analogies
 	\item training with SGD or ALS
-	\item Skip-Gram (original word2vec) uses binary classification to distinguish real from fake word pairs. Again boils down to matrix factorisation.
+	\item Skip-Gram (original word2vec) uses binary classification to distinguish real from fake word pairs. Implicitly based on matrix factorisation.
 	\item FastText: supervised sentence classification.
 	\begin{itemize}
 		\item Sentence as $x_n$ bag-of-words representation, f is a linear classifier loss, $y_n \in \{0,1\}$
@@ -831,17 +797,14 @@ Find solution $\min{\L(\*w)}$ s.t. $\*w \in \mathcal{C}$
 
 \section{Singular Value Decomposition}
 \begin{itemize}
-	\item Matrix factorization method
-	\begin{myalign*}
-	    \*X = \*U \*S \*V^T
-	\end{myalign*}
+	\item Matrix factorization method $\*X = \*U \*S \*V^T$
 	\begin{itemize}
 		\item $\*U$ orthonormal $D \times D$, $\*V$ orthonormal $N \times N$
 		\item $\*S$ contains (non-negative) singular values in diagonal in descending order: $D \times N$
 		\item Columns of $\*U$ and $\*V$ are the left and right \textbf{singular vectors}.
 	\end{itemize}
 	\item {\bf Truncated SVD}: \\
-	Take the matrix $\*S^{(K)}$ with the $K$ first diagonal elements non zero. Then, best rank-$K$ approx:	
+	Take the matrix $\*S^{(K)}$ with the $K$ first diagonal elements non zero.	
 	\begin{myalign*}
 		\*X \approx \*X_K = \*U\*S^{(K)}\*V^T
 	\end{myalign*}
@@ -858,7 +821,7 @@ $\Vert\*X - \hat{\*X}\Vert_F^2 \geq \Vert \*X - \*U_k\*U_k^\top\*X \Vert_F^2 = \
     \*\Sigma = \frac{1}{N} \*X \*X^T &\Rightarrow \*X \*X^T = \*U \*S^2 \*U^T \\
     \Rightarrow \*U^T \*X \*X^T \*U &= \*U^T \*U \*S^2 \*U^T \*U = \*S^2\\
 \end{myalign*}
-\item Thus the columns of matrix $\*U$ are called the \textbf{principal components} and they decorrelate the covariance matrix.
+\item Columns of $\*U$ are called \textbf{principal components} and decorrelate the columns of $\*X$.
 \item Not invariant under scalings $\rightarrow$ normalize $\*X$
 \item Can compute U and S efficiently via $EVD(\*X\*X^\top)$ or $EVD(\*X^\top\*X)$
 
@@ -871,7 +834,7 @@ $\Vert\*X - \hat{\*X}\Vert_F^2 \geq \Vert \*X - \*U_k\*U_k^\top\*X \Vert_F^2 = \
 	\item $x_j^{(l)} = \phi\left(\sum_i w_{i,j}^{(l)}x_i^{(l-1)} + b_j^{(l)} \right)$.
 	\item NN with one hidden layer and sigmoid-like activation function can approximate any sufficiently smooth function on a bounded domain in average ($\leq\frac{(2Cr)^2}{n}$) and point-wise
 	\item Cost function: \\$\L = \frac{1}{N} \sum_{n=1}^N\left( y_n - f^{(L+1)} \circ ... \circ f^{(1)}(\bm x_n^{(0)})\right)^2$ \\
-	We can use SGD to minimize the cost function.
+	We can use SGD to minimize the cost.
 \end{itemize}
 
 % ========================================================
@@ -910,7 +873,7 @@ $\Vert\*X - \hat{\*X}\Vert_F^2 \geq \Vert \*X - \*U_k\*U_k^\top\*X \Vert_F^2 = \
  
 \subsection{Convolutional NN} 
 
-Sparse connections and \textit{weights sharing}: reduce complexity. (e.g. pixels in pictures only depend on neighbours)
+Sparse connections and \textit{weights sharing}: reduce parameters.
 
 % ======================================================== 
  
@@ -930,7 +893,7 @@ Sparse connections and \textit{weights sharing}: reduce complexity. (e.g. pixels
 
 \section{Bayes Net}
 \begin{itemize}
-	\item Graph example: $p(x, y, z) = p(y | x) p(z | x) p(x)$ : $(y \leftarrow x \rightarrow z)$ 
+	\item Graph example: $p(x, y, z) =  p(x) p(y | x) p(z | x)$ : $(y \leftarrow x \rightarrow z)$ 
 	\item \textbf{D-Separation} X and Y are D-separated by Z if every path from $ x \in X$ to $y \in Y$ is blocked by Z. ($\rightarrow$ independent)
 	\item \textbf{Blocked Path} contains a variable that
 	\begin{itemize}
