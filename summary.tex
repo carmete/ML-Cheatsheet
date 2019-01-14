@@ -341,6 +341,12 @@ Find solution $\min{\L(\*w)}$ s.t. $\*w \in \mathcal{C}$
 
 % ========================================================
 
+\section{Model Selection}
+\begin{itemize}
+    \item Generalisation error: $L_D(f)=\mathbb{E}[l(y,f(x))]$
+    
+\end{itemize}
+
 \section{Bias-Variance decomposition}
 \begin{itemize}
 	\item {\bf Simple} (e.g. large  $\lambda$) $\rightarrow$ large bias but low variance
@@ -802,6 +808,20 @@ Find solution $\min{\L(\*w)}$ s.t. $\*w \in \mathcal{C}$
 % ========================================================
 
 \section{Text Representation}
+\begin{itemize}
+	\item \textbf{Word representations by matrix factorisation}
+	\item typically use log counts from co-occurance matrix
+	\item $\min_{w,z} L(w,z) = \frac{1}{2} \sum_{(d,n)\in\Omega} f_{dn} [x_{dn} - (WZ^\top)_{dn}]^2$, $f_{dn}$: importance of entry
+	\item $f_{dn} = 1$ is okay, but better $f_{dn} = \min[1, (n_{dn}/N_{max}^\alpha], \alpha \in [0,1], n_{dn}$ are counts.
+	\item weighting is called GloVe (word2vec variant) and creates spacial analogies (man - king; woman - queen)
+	\item training with SGD or ALS
+	\item Skip-Gram (original word2vec) uses binary classification to distinguish real from fake word pairs. Again boils down to matrix factorisation.
+	\item FastText: supervised sentence classification.
+	\begin{itemize}
+		\item Sentence as $x_n$ bag-of-words representation, f is a linear classifier loss, $y_n \in \{0,1\}$
+		\item $\min_{W,Z} L(W,Z) = \sum_{x_n} f(y_n, WZ^\top x_n), W is 1 \times K, Z \vert V \vert \times K$ 
+	\end{itemize}
+\end{itemize}
 
 \section{Singular Value Decomposition}
 \begin{itemize}
