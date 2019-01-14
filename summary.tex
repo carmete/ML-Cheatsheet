@@ -451,6 +451,10 @@ Find solution $\min{\L(\*w)}$ s.t. $\*w \in \mathcal{C}$
 		\begin{myalign*}
 		    p(\*y | \bm \eta) = h(y) \exp(\bm \eta^T \bm \phi(\*y) - A(\bm \eta))
 		\end{myalign*}
+	  \item For proper normalisation ($\int p = 1$):
+	  	\begin{myalign*}
+		    A(\bm \eta) = \ln[\int_y h(y) \exp(\bm \eta^T \bm \phi(\*y))]
+		\end{myalign*}
       \item {\bf Bernoulli} distribution example
       \begin{myalign*}
 	  \rightarrow \exp( \log(\frac{\mu}{1 - \mu})y + \log(1 - \mu)))
@@ -496,33 +500,45 @@ Find solution $\min{\L(\*w)}$ s.t. $\*w \in \mathcal{C}$
 
 \section{k-Nearest Neighbor (k-NN)}
 \begin{itemize}
-	\item The k-NN prediction for $\*x$ is
+	\item Performs best in low dimensions.
+	\item Assumes close points have similar values 
+	\item The k-NN regressor:
 	\begin{myalign*}
 	    f(\*x) = \frac{1}{k} \sum_{\*x_n \in nbh_k(\*x)} \*y_n
 	\end{myalign*}
-	where $nbh_k(\*x)$ is the neightborhood of $\*x$ defined by the k closest points $\*x_n$.
-	\item \textbf{Curse of dimensionality}: Generalizing correctly becomes exponentially harder as the dimensionality grows.
-	\item Gathering more inputs variables may be bad
+	\item The k-NN classifier:
+	\begin{myalign*}
+	    f(\*x) = modus{x_n| \*x_n \in nbh_k(\*x)}
+	\end{myalign*}
+	\item Large k $\rightarrow$ smoothing over large area
+	\item Small k $\rightarrow$ averaging over small area
+	\item \textbf{Curse of dimensionality}:
+	\begin{itemize}
+		\item[a)] As dimensionality grows fixed-size training set covers dwindling fraction of input space $\Rightarrow$ If we want to consider fixed fraction $\alpha$ of points and increase dimension, we need to explore almost whole range in each dimension.
+		\item[b)] In high dimensions, points are far from each other $\Rightarrow$ choice of NN becomes essentially random. \\
+		          Need radius \\
+		          $r = \sqrt[\leftroot{-2}\uproot{2}d]{(1-\frac{1}{\sqrt[\leftroot{-2}\uproot{2}N]{2}})}$ \\
+		          to have at least one data point in $r^d$ rectangle with $p \geq \frac{1}{2}$.
+	\end{itemize}
+	\item \textbf{NN performance}:
+	\begin{itemize}
+		\item Optimal classifier:$ f_*(x) = \mathbb{1}{\mathbbm{P}[y=1|x] > \frac{1}{2}}$
+		\item $\mathbb{E}_S[L(f_S)] \leq 2 L(f_*) + 4c\sqrt{d}N^{\frac{-1}{1+d}}$
+	\end{itemize}
 \end{itemize}
 
 % ========================================================
 
 \section{Support Vector Machine} 
 \begin{itemize}
-	\item Combination of the kernel trick plus a modified loss function (Hinge loss)
-	\item Solution to the dual problem is sparse and non-zero entries will be our \textbf{support vectors}.
-	\item \textbf{Kernelised feature vector} where $\bm \mu_k$ are centroids
-	\begin{myalign*}
-	    \bm \phi(\*x) = [k(\*x, \bm \mu_1), ..., k(\*x, \bm \mu_K)]
-	\end{myalign*}
-	\item In practice we'll take a subset of data points to be prototype $\rightarrow$ \textbf{sparse vector machine}.
 	\item Assume $y_n \in \{-1, 1\}$
 	\item SVM optimizes the following cost
 	\begin{myalign*}
-	    \L(\* w) = \min_{\* w} \sum_{n = 1}^N [1 - \*y_n \tilde{\* \phi}_n^T \* w]_+ + \frac{\lambda}{2} \lVert \*w \lVert^2
+	    \L(\* w) = \min_{\* w} \sum_{n = 1}^N [1 - \*y_n x_n^T \* w]_+ + \frac{\lambda}{2} \lVert \*w \lVert^2
 	\end{myalign*}
-	\item Minimum doesn't change with a rescaling of $\* w$
-	\item choose the hyperplane so that the distance from it to the nearest data point on each side is maximized
+	\item Can be optimised using subgradient descent.
+	\item \textbf{Case: Linear separability:} We get a seperating hyperplane, no point in the margin and w, s.t margin is maximised ($2/\Vert w \Vert$).
+	\item This is called hard-margin compared to soft-margin formulation.
 	\item \textbf{Duality}:
 	\begin{itemize}
 		\item Hard to minimize $g(\* w)$ so we define
@@ -556,9 +572,7 @@ Find solution $\min{\L(\*w)}$ s.t. $\*w \in \mathcal{C}$
 		\begin{myalign*}
 		    \max_{\bm \alpha \in [0, 1]^N} \bm \alpha^T \*1 - \frac{1}{2\lambda} \bm \alpha^T \*Y \* X  \*X^T \* Y \bm \alpha
 		\end{myalign*}
-		\item This is a differentiable least-squares problem. Optimization is easy using Sequential Minimal Optimization. It is also naturally kernelized with $\*K = \bm X^T \bm X$
-		\item The solution $\bm \alpha$ is sparse and is non-zero only for the training examples that are instrumental in determining the decision boundary.
-		\item $\bm \alpha$ is the slope of lines that are lower bound to Hinge loss
+		\item Data only enters as $\*K = \bm X^T \bm X$.
 	\end{itemize}
 \end{itemize}
 
@@ -591,7 +605,7 @@ Find solution $\min{\L(\*w)}$ s.t. $\*w \in \mathcal{C}$
 	    \right)
 	\end{myalign*}
 	\item $\*K = \*X \*X^T$ is called the \textbf{kernel matrix} or \textbf{Gram matrix}.
-	\item If $\*K$ is positive definite, then it's called a \textbf{Mercer Kernel}.
+	\item If $\*K$ is positive definite and symmetric, then it's called a \textbf{Mercer Kernel}.
 	\item $\*K_{i,j} = k(\*x_i, \*x_j)$
 	\item If the kernel is Mercer, then there exists a function $\bm \phi(\*x)$ s.t.
 	\begin{myalign*}
@@ -612,19 +626,13 @@ Find solution $\min{\L(\*w)}$ s.t. $\*w \in \mathcal{C}$
 	
 	\item \textbf{Common Kernel}
 	\begin{itemize}
-		\item Polynomial Kernel: $(\gamma \langle \*x_i, \*x_j \rangle + r) ^d$
+		\item $x\in\mathbb{R}, k(\*x, \*x') = (xx')^2 \Rightarrow \phi(x)=x^2$
 		\item Radial Basis function kernel (RBF)
 			\begin{myalign*}
 	    			 k(\*x, \*x') = \exp(- \frac{1}{2}(\*x - \*x')^T (\*x - \*x'))
-			 \end{myalign*} 
-		\item Sigmoid Kernel: $\tanh (\langle \*x_i, \*x_j \rangle + r)$ 
+			 \end{myalign*}  
 	\end{itemize}
 	 
-	\item \textbf{Properties of kernels} to ensure the existance of a corresponding $\bm \phi$:
-	\begin{itemize}
-		\item symmetric: $k(\*x, \*x') = k(\*x', \*x)$
-		\item positive semi-definite.
-	\end{itemize}
 	\item Thus we get
 	\begin{myalign*}
 	    \*y = \*w^T \*x = \sum_{i = 1}^K \alpha_i \*x_i^T \*x = \sum_{i = 1}^K \alpha_i k(\*x, \*x_i) 
@@ -633,6 +641,16 @@ Find solution $\min{\L(\*w)}$ s.t. $\*w \in \mathcal{C}$
 
 % ========================================================
 
+\section{Unsupervised}
+ Learn pattern without labels.
+\begin{itemize}
+	\item \textbf{word2vec}: map every word to a vector $w_i \in \mathbb{R}^K$, K large, that captures its semantics.
+	\item \textbf{Topic model}: Documents consist of collections of topics
+		\begin{itemize}
+			\item topic = probability distribution over words
+			\item use clustering to pick out respresentative topics
+		\end{itemize}
+\end{itemize}
 
 \section{K-means}
 \begin{itemize}
@@ -677,6 +695,7 @@ Find solution $\min{\L(\*w)}$ s.t. $\*w \in \mathcal{C}$
 \end{itemize}
 
 % ========================================================
+
 
 \section{Gaussian Mixture Models}
 \begin{itemize}
