@@ -801,6 +801,8 @@ Find solution $\min{\L(\*w)}$ s.t. $\*w \in \mathcal{C}$
 \end{itemize}
 % ========================================================
 
+\section{Text Representation}
+
 \section{Singular Value Decomposition}
 \begin{itemize}
 	\item Matrix factorization method
@@ -808,18 +810,12 @@ Find solution $\min{\L(\*w)}$ s.t. $\*w \in \mathcal{C}$
 	    \*X = \*U \*S \*V^T
 	\end{myalign*}
 	\begin{itemize}
-		\item $\*U$ is a unitary $D \times D$ matrix
-		\item $\*V$ is a unitary $N \times N$ matrix
-		\item $\*S$ is a non-negative diagonal matrix of size $D \times N$ which are called \textbf{singular values} appearing in a descending order.
-		\item Columns of $\*U$ and $\*V$ are the left and right \textbf{singular vectors} respectively.
+		\item $\*U$ orthonormal $D \times D$, $\*V$ orthonormal $N \times N$
+		\item $\*S$ contains (non-negative) singular values in diagonal in descending order: $D \times N$
+		\item Columns of $\*U$ and $\*V$ are the left and right \textbf{singular vectors}.
 	\end{itemize}
-	\item Assuming $D < N$ we have
-	\begin{myalign*}
-	    \*X = \sum_{d = 1}^D s_d \*u_d \*v_d^T
-	\end{myalign*}
-	This tells you about the spectrum of $\*X$ where higher singular vectors contain the \textit{low-frequency information} and lower singular values contain the \textit{high-frequency information}. 
 	\item {\bf Truncated SVD}: \\
-	Take the matrix $\*S^{(K)}$ with the $K$ first diagonal elements non zero. Then, rank-$K$ approx:	
+	Take the matrix $\*S^{(K)}$ with the $K$ first diagonal elements non zero. Then, best rank-$K$ approx:	
 	\begin{myalign*}
 		\*X \approx \*X_K = \*U\*S^{(K)}\*V^T
 	\end{myalign*}
@@ -829,29 +825,25 @@ Find solution $\min{\L(\*w)}$ s.t. $\*w \in \mathcal{C}$
 
 \section{Principal Component Analysis}
 \begin{itemize}
-	\item PCA is a dimensionality reduction method and a method to decorrelate the data
-$\*X \approx \tilde{\*X} = \*W \*Z^T$
-such that columns of $\*W$ are orthogonal.
-\item If the data is zero mean
+	\item dimensionality reduction and decorrelation
+$\Vert\*X - \hat{\*X}\Vert_F^2 \geq \Vert \*X - \*U_k\*U_k^\top\*X \Vert_F^2 = \sum_{i>K}s_i^2$
+\item If the data has zero mean
 \begin{myalign*}
     \*\Sigma = \frac{1}{N} \*X \*X^T &\Rightarrow \*X \*X^T = \*U \*S^2 \*U^T \\
     \Rightarrow \*U^T \*X \*X^T \*U &= \*U^T \*U \*S^2 \*U^T \*U = \*S^2\\
 \end{myalign*}
 \item Thus the columns of matrix $\*U$ are called the \textbf{principal components} and they decorrelate the covariance matrix.
-\item Using SVD, we can compute the matrices in the following way
-\begin{myalign*}
-    \*W &= \*U \*S_D^{1 / 2}, \*Z^T = \*S^{1 / 2}\*V^T 
-\end{myalign*}
-\item Not invariant under scalings of the feature = arbitrariness, $\rightarrow$ normalize $\*X$
+\item Not invariant under scalings $\rightarrow$ normalize $\*X$
+\item Can compute U and S efficiently via $EVD(\*X\*X^\top)$ or $EVD(\*X^\top\*X)$
+
 \end{itemize}
 
 
 
 \section{Neural Net}
 \begin{itemize}
-	\item Basic structure: 
-	One \emph{input} layer of size D, L \emph{hidden} layers of size K, and one \emph{output} layer. (\emph{feedforward} network). $x_j^{(l)} = \phi\left(\sum_i w_{i,j}^{(l)}x_i^{(l-1)} + b_j^{(l)} \right)$.
-	\item NN can represent the Rienmann sum with only two layers $\Rightarrow$ It's powerful!
+	\item $x_j^{(l)} = \phi\left(\sum_i w_{i,j}^{(l)}x_i^{(l-1)} + b_j^{(l)} \right)$.
+	\item NN with one hidden layer and sigmoid-like activation function can approximate any sufficiently smooth function on a bounded domain in average ($\leq\frac{(2Cr)^2}{n}$) and point-wise
 	\item Cost function: \\$\L = \frac{1}{N} \sum_{n=1}^N\left( y_n - f^{(L+1)} \circ ... \circ f^{(1)}(\bm x_n^{(0)})\right)^2$ \\
 	We can use SGD to minimize the cost function.
 \end{itemize}
@@ -905,7 +897,7 @@ Sparse connections and \textit{weights sharing}: reduce complexity. (e.g. pixels
 	\Theta[t+1] = \Theta[t] + \eta (\nabla \L + \mu \Theta[t])
 	\end{myalign*}
 	\item Data Augm.: e.g. shift or rotation of pics
-	\item Dropout: avoid overfit. Drop nodes randomly. (Then average multiple drop-NN)
+	\item Dropout: avoid overfit. Drop nodes randomly. (Then average multiple drop-NN or divide by dropout rate.)
 \end{itemize}
 
 % ========================================================
