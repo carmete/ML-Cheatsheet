@@ -28,6 +28,7 @@
 \usepackage{comment}
 \usepackage{bbm}
 
+
 \ifthenelse{\lengthtest { \paperwidth = 11in}}
 	{ \geometry{top=.5in,left=.5in,right=.5in,bottom=.5in} }
 	{\ifthenelse{ \lengthtest{ \paperwidth = 297mm}}
@@ -46,6 +47,9 @@
 		{\geometry{top=0.3cm,left=0.3cm,right=0.3cm,bottom=0.3cm} }
 		{\geometry{top=0.3cm,left=0.3cm,right=0.3cm,bottom=0.3cm} }
 	}
+	
+% Increase bottom margin for better printing
+\geometry{bmargin=.21in}
 
 \newcommand{\specialcell}[2][c]
 {
@@ -62,7 +66,7 @@
 \renewcommand{\section}{\@startsection{section}{1}{0mm}%
                                 {-1ex plus -.5ex minus -.2ex}%
                                 {0.5ex plus .2ex}%x
-                                {\normalfont\tiny\bfseries}}
+                                {\color{red}\normalfont\tiny\bfseries}}
                                 % {\normalfont\large\bfseries\sc}}
 \renewcommand{\subsection}{\@startsection{subsection}{2}{0mm}%
                                 {-1explus -.5ex minus -.2ex}%

@@ -24,6 +24,7 @@
     \item \textbf{positive definite} (pd) if $\*a^T \*V \*a > 0$
 	\item $(\*x-\*b)^T (\*x-\*b) = \lVert \*x - \*b \lVert^2_2 $
 	\item $\lVert \mathbf{X} \lVert_F =\lVert \mathbf{X}^T \lVert_F$
+	\item $det X = x_{11}x_{22} - x_{12}x_{21}$, if X is $2 \times 2$
 \end{itemize}
 
 \subsection{Distributions}
@@ -50,26 +51,6 @@ A function $f(x)$ is convex if
    \item composition of convex and linear functions
    \item $f(x) = g(h(x))$, g,h are convex, g increasing
    \item the Hessian $\*H$ is positive semi-definite
-	
-\end{itemize}
-
-
-\subsection{Others}
-
-\begin{itemize}
-    \item Production of independent variables:
-        \begin{myalign*}
-            \V(xy) = \E(x^2)\E(y^2) - [\E(x)]^2 [\E(y)]^2
-        \end{myalign*}
-    \item Covariance matrix of a data vector $\*x$
-   		\begin{myalign*}
-   		    \*\Sigma = \frac{1}{N} \sum_{n = 1}^N (\*x_n - \E(\*x))(\*x_n - \E(\*x))^T
-   		\end{myalign*}
-    \item Multi-class $\*x$
-   		\begin{myalign*}
-   		    p(\* y | \*X, \beta) &= \prod^N p(\* y_n | \*x_n, \beta) \\
-   		     &= \prod^K \prod^N [p(\* y_n = k| \*x_n, \beta)]^{\tilde{y}_{nk}}
-   		\end{myalign*}
 	
 \end{itemize}
 
@@ -161,7 +142,7 @@ Non-convex, non-diff., but robust to outliers.
 \subsection{SGD - Stochastic Gradient Descent}
 SGD update rule (only n-th training example):
 $$ \*w^{(t + 1)} \leftarrow \*w^{(t)} - \gamma \bm \nabla \L_n(\*w^{(t)})$$
-\emph{Idea}: Cheap but unbiased estimate of grad. $$\E[\bm\nabla\L_n(\*w)] = \bm \nabla(\*w)$$
+\emph{Idea}: Cheap but unbiased estimate of grad. $$\E[\bm\nabla\L_n(\*w)] = \bm \nabla L(\*w)$$
 \\
 Robbins-Monroe condition:
 \begin{itemize}
@@ -499,7 +480,7 @@ Find solution $\min{\L(\*w)}$ s.t. $\*w \in \mathcal{C}$
 	\item Small k $\rightarrow$ averaging over small area
 	\item \textbf{Curse of dimensionality}:
 	\begin{itemize}
-		\item[a)] If we want to consider fixed fraction $\alpha$ of points and increase dimension, we need to explore almost whole range in each dimension.
+		\item[a)] Consider fixed fraction $\alpha$ of points and increase dimension $rightarrow$ need to explore almost whole range in each dimension.
 		\item[b)] In high dimensions, points are far from each other $\Rightarrow$ choice of NN becomes essentially random. \\
 		          Need radius \\
 		          $r = \sqrt[\leftroot{-2}\uproot{2}d]{(1-\frac{1}{\sqrt[\leftroot{-2}\uproot{2}N]{2}})}$ \\
@@ -507,7 +488,7 @@ Find solution $\min{\L(\*w)}$ s.t. $\*w \in \mathcal{C}$
 	\end{itemize}
 	\item \textbf{NN performance}:
 	\begin{itemize}
-		\item Optimal classifier:$ f_*(x) = \mathbbm{1}\{\mathbbm{P}[y=1|x] > \frac{1}{2}\}$
+		\item Bayes classifier:$ f_*(x) = \mathbbm{1}\{\mathbbm{P}[y=1|x] > \frac{1}{2}\}$
 		\item $\mathbb{E}_S[L(f_S)] \leq 2 L(f_*) + 4c\sqrt{d}N^{\frac{-1}{1+d}}$
 	\end{itemize}
 \end{itemize}
@@ -614,6 +595,12 @@ Find solution $\min{\L(\*w)}$ s.t. $\*w \in \mathcal{C}$
 	\begin{myalign*}
 	    \*y = \*w^T \*x = \sum_{i = 1}^K \alpha_i \*x_i^T \*x = \sum_{i = 1}^K \alpha_i k(\*x, \*x_i) 
 	\end{myalign*}
+	\item \textbf{Creating new kernels:}
+	\begin{itemize}
+		\item $\kappa(x,x') = a\kappa_1(x, x') + b\kappa_2(x, x')$
+		\item $\kappa(x,x') = \kappa_1(x, x') \kappa_2(x, x')$
+		\item $\kappa(x,x') = \kappa_1(f(x), f(x'))$
+	\end{itemize}
 \end{itemize}
 
 \section{K-means}
@@ -661,7 +648,7 @@ Find solution $\min{\L(\*w)}$ s.t. $\*w \in \mathcal{C}$
 
 \section{Gaussian Mixture Models}
 \begin{itemize}
-	\item Clusters can be elliptical using a full covariance matrix instead of isotropic covariance.
+	\item Clusters can be elliptical using a full instead of isotropic covariance matrix.
 	\begin{myalign*}
 	    p(\*X | \bm \mu, \bm \Sigma, \*z) = \prod_{n = 1}^N \prod_{k = 1}^K 
 		    \left[
@@ -767,7 +754,7 @@ Find solution $\min{\L(\*w)}$ s.t. $\*w \in \mathcal{C}$
 	     \*Z^T &\leftarrow (\*W^T \*W + \lambda_z \*I_K)^{-1} \*W^T \*X \\
 	     \*W^T &\leftarrow (\*Z^T \*Z + \lambda_w \*I_K)^{-1} \*Z^T\*X^T
 	 \end{myalign*}
-	 \item \textit{Complexity}: $O(D N K^2 + N K^3) \rightarrow O(D N K^2)$ \textcolor{red}{???}
+	 \item $\mathbb{O}(D N K + D K^2)$ and $\mathbb{O}(D N K + N K^2)$
 
 \end{itemize}
 % ========================================================
@@ -801,7 +788,7 @@ Find solution $\min{\L(\*w)}$ s.t. $\*w \in \mathcal{C}$
 	\begin{itemize}
 		\item $\*U$ orthonormal $D \times D$, $\*V$ orthonormal $N \times N$
 		\item $\*S$ contains (non-negative) singular values in diagonal in descending order: $D \times N$
-		\item Columns of $\*U$ and $\*V$ are the left and right \textbf{singular vectors}.
+		\item Columns of $\*U$ and $\*V$ are the left and right \textbf{singular vectors} (eigenvectors of $\*X\*X^\top$ and $\*X^\top\*X$).
 	\end{itemize}
 	\item {\bf Truncated SVD}: \\
 	Take the matrix $\*S^{(K)}$ with the $K$ first diagonal elements non zero.	
@@ -821,7 +808,7 @@ $\Vert\*X - \hat{\*X}\Vert_F^2 \geq \Vert \*X - \*U_k\*U_k^\top\*X \Vert_F^2 = \
     \*\Sigma = \frac{1}{N} \*X \*X^T &\Rightarrow \*X \*X^T = \*U \*S^2 \*U^T \\
     \Rightarrow \*U^T \*X \*X^T \*U &= \*U^T \*U \*S^2 \*U^T \*U = \*S^2\\
 \end{myalign*}
-\item Columns of $\*U$ are called \textbf{principal components} and decorrelate the columns of $\*X$.
+\item Columns of $\*U$ are called \textbf{principal components} and decorrelate $\*X$'s columns.
 \item Not invariant under scalings $\rightarrow$ normalize $\*X$
 \item Can compute U and S efficiently via $EVD(\*X\*X^\top)$ or $EVD(\*X^\top\*X)$
 
