@@ -386,7 +386,6 @@ Find solution $\min{\L(\*w)}$ s.t. $\*w \in \mathcal{C}$
 		\begin{myalign*}
 		    S_{nn} = \sigma(\* x_n^T\* w)(1 - \sigma(\* x_n^T \* w))
 		\end{myalign*}
-		\item The neg. log-likelihood is not strictly convex. \textcolor{red}{????}
 	\end{itemize}
 	\item \textbf{Newton's Method} %LEARN
 	\begin{itemize}
@@ -545,7 +544,7 @@ Find solution $\min{\L(\*w)}$ s.t. $\*w \in \mathcal{C}$
 	\item {\bf Non support vector}: Example that lies on the correct side, outside margin $\bm \alpha_n = 0$
 	\item {\bf Essen. support vector}: Example that lies on the margin $\bm \alpha_n \in (0,1)$
 	\item {\bf Bound support vector}: Example that lies strictly inside the margin or wrong side $\bm \alpha_n = 1$
-	\item Use Coordinates ascent to find $\bm \alpha$. Update one coordinate ($\argmin$) at the time and others constant.
+	\item Use Coordinates ascent to find $\bm \alpha$. Update one coordinate at a time.
 \end{itemize}
 
 % ========================================================
@@ -761,7 +760,7 @@ Find solution $\min{\L(\*w)}$ s.t. $\*w \in \mathcal{C}$
 
 \section{Text Representation}
 \begin{itemize}
-	\item \textbf{word2vec}: map every word to a vector $w_i \in \mathbb{R}^K$, K large, that captures its semantics.
+	\item \textbf{word2vec}: map every word to a vector $w_i \in \mathbb{R}^K$, K large, that captures its semantics (efficient streaming).
 	\item \textbf{Topic model}: Documents consist of collections of topics
 		\begin{itemize}
 			\item topic = probability distribution over words
@@ -772,7 +771,7 @@ Find solution $\min{\L(\*w)}$ s.t. $\*w \in \mathcal{C}$
 	\item $\min_{w,z} L(w,z) = \frac{1}{2} \sum_{(d,n)\in\Omega} f_{dn} [x_{dn} - (WZ^\top)_{dn}]^2$
 	\item $f_{dn}$: importance of entry
 	\item $f_{dn} = 1$ is okay, but better $f_{dn} = \min[1, (n_{dn}/N_{max}^\alpha], \alpha \in [0,1], n_{dn}$ are counts.
-	\item this weighting is called GloVe (word2vec variant) and creates spatial analogies
+	\item this weighting is called GloVe (word2vec variant) and creates spatial analogies (nonstreaming)
 	\item training with SGD or ALS
 	\item Skip-Gram (original word2vec) uses binary classification to distinguish real from fake word pairs. Implicitly based on matrix factorisation.
 	\item FastText: supervised sentence classification.
@@ -860,7 +859,7 @@ $\Vert\*X - \hat{\*X}\Vert_F^2 \geq \Vert \*X - \*U_k\*U_k^\top\*X \Vert_F^2 = \
  
 \subsection{Convolutional NN} 
 
-Sparse connections and \textit{weights sharing}: reduce parameters.
+Sparse connections, weight sharing: reduce params.
 
 % ======================================================== 
  
